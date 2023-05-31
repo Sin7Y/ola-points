@@ -33,6 +33,7 @@
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts",
     "batch:mint": "hardhat run  scripts/batch_mint.ts",
+    "verify": "hardhat run scripts/verify.ts",
     "test": "hardhat test"
   },
   "dependencies": {

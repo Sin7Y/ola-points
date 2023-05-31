@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import XLSX from "xlsx";
 import { BigNumber } from "ethers";
 import { OlaPoints__factory } from "../types";
+import { time } from "node:console";
 
 
 async function main() {
@@ -11,12 +12,11 @@ async function main() {
     // We get the contract to deploy on testnet
     const olaPoints = await OlaPoints__factory.connect("0x67BBb9b28c2794eA81dE46771283643572BcCdE4", owner);
 
-    var workbook = XLSX.readFile('./scripts/points-2023-05-26.xlsx');
+    var workbook = XLSX.readFile('./scripts/May31th_Ola_Points_addresses.xlsx');
     var sheet_name_list = workbook.SheetNames;
     console.log(sheet_name_list);
     {
         let addresses: string[] = [];
-        // define Auction and presale tokenID
         let nums: BigNumber[] = [];
         sheet_name_list.forEach(function (name) { /* iterate through sheets */
             let worksheet = workbook.Sheets[name];
@@ -32,22 +32,33 @@ async function main() {
         console.log(addresses);
         console.log(nums);
 
-        const tx = await olaPoints.batchTransfer(addresses, nums);
-        console.log('tx hash: ', tx.hash);
-        const receipt = await tx.wait();
 
-        if (receipt.status) {
-            console.log('tx success');
-            for (let i = 0; i < receipt.logs.length; i++) {
-                console.log("transferd token", BigNumber.from(receipt.logs[i].topics[3]).toNumber());
+        const batchSize = 1000;
+        for (let i = 0; i < addresses.length; i += batchSize) {
+            // Slice addresses and nums arrays for batch processing
+            let batchAddresses = addresses.slice(i, i + batchSize);
+            let batchNums = nums.slice(i, i + batchSize);
+
+            // let estimateGas: BigNumber = await olaPoints.estimateGas.batchTransfer(batchAddresses, batchNums);
+            // console.log("estimateGas: ", estimateGas.toString());
+
+            const tx = await olaPoints.batchTransfer(batchAddresses, batchNums);
+            console.log('tx hash: ', tx.hash);
+            const receipt = await tx.wait();
+
+            if (receipt.status) {
+                console.log('tx success');
+                setTimeout(() => { }, 1000);
+            } else {
+                throw new Error(`failed to transfer token`);
+                // }
             }
-        } else {
-            throw new Error(`failed to transfer token`);
         }
     }
-
-
 }
+
+
+
 
 
 // We recommend this pattern to be able to use async/await everywhere

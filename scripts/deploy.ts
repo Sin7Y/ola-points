@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 async function main() {
 
   const OlaPoints = await ethers.getContractFactory("OlaPoints");
-  const olaPoints = await OlaPoints.deploy("Ola Points", "OLAP");
+  const olaPoints = await OlaPoints.deploy("Ola-Vm Points", "OVP");
 
   await olaPoints.deployed();
 

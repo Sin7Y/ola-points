@@ -9,5 +9,5 @@ typechain-types
 cache
 artifacts
 
-.types
-.typechain
+./types/*
+.DS_Store
